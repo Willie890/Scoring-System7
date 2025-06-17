@@ -28,32 +28,9 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
     console.error("Login error:", error);
   }
 });
-  // User accounts with roles (now using array of objects instead of plain object)
-  const users = [
-    { username: "Jp Soutar", password: "1234", role: "admin" },
-    { username: "Jp Faber", password: "1234", role: "admin" },
-    { username: "user1", password: "5678", role: "user" }
-  ];
 
-  // Find user (case-insensitive username match)
-  const user = users.find(u => 
-    u.username.toLowerCase() === username.toLowerCase() && 
-    u.password === password
-  );
 
-  if (user) {
-    // Store the complete user object with role
-    localStorage.setItem("loggedInUser", JSON.stringify(user));
-    
-    // Redirect to appropriate page based on role
-    window.location.href = user.role === "admin" ? "admin_home.html" : "user_home.html";
-  } else {
-    // Show error message in the div instead of alert
-    errorEl.textContent = "Invalid username or password";
-    // Clear password field
-    document.getElementById("password").value = "";
-  }
-});
+
 
 
 
