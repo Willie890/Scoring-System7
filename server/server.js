@@ -1,10 +1,8 @@
-require('dotenv').config(); // Add this at the top
-const { connectToDatabase } = require('./db');
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { connectToDatabase, getDb, COLLECTIONS } = require('./db');
+const { connectToDatabase, COLLECTIONS } = require('./db'); // Single import statement
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,10 +12,23 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// Initialize database connection
-connectToDatabase().then(() => {
-  // Database initialized successfully
-});
+// Database connection state
+let db;
+
+async function initializeServer() {
+  try {
+    db = await connectToDatabase();
+    console.log('Database connection established');
+
+    // Start the server
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to initialize server:', error);
+    process.exit(1);
+  }
+}
 
 // Authentication Middleware
 const authenticate = async (req, res, next) => {
@@ -37,7 +48,6 @@ const authenticate = async (req, res, next) => {
 // Login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
-  const db = getDb();
   
   try {
     const user = await db.collection(COLLECTIONS.USERS).findOne({
@@ -55,7 +65,6 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
-
 // Scores
 app.get('/api/scores', authenticate, async (req, res) => {
   const db = getDb();
@@ -199,13 +208,13 @@ app.post('/api/reset/all', authenticate, async (req, res) => {
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Initialize the server
+initializeServer();
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
-  await closeConnection();
+  if (db && db.client) {
+    await db.client.close();
+  }
   process.exit();
 });
