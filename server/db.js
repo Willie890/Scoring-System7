@@ -1,13 +1,12 @@
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
 
-// Correct connection string format
-const uri = process.env.MONGODB_URI || "mongodb+srv://JpSoutar:1234@scoringsystemcluster.z3xut62.mongodb.net/pointsDB?retryWrites=true&w=majority&appName=Scoringsystemcluster";
-
+const uri = process.env.MONGODB_URI;
 const DB_NAME = "pointsDB";
+
 const COLLECTIONS = {
   USERS: "users",
-  SCORES: "scores", 
+  SCORES: "scores",
   HISTORY: "history",
   REQUESTS: "requests"
 };
@@ -21,22 +20,16 @@ async function connectToDatabase() {
   try {
     client = new MongoClient(uri, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 10000
+      useUnifiedTopology: true
     });
     
     await client.connect();
     db = client.db(DB_NAME);
-    
-    // Verify connection
-    await db.command({ ping: 1 });
-    console.log("Connected to MongoDB");
-    
+    console.log("Database connected");
     return db;
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
-    process.exit(1);
+  } catch (err) {
+    console.error("Connection error:", err);
+    throw err;
   }
 }
 
