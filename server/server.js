@@ -213,8 +213,6 @@ initializeServer();
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
-  if (db && db.client) {
-    await db.client.close();
-  }
+  await closeConnection();
   process.exit();
 });
