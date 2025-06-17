@@ -1,5 +1,21 @@
-"scripts": {
-  "start": "node server.js",
-  "dev": "nodemon server.js",
-  "init-db": "node initDB.js"
+{
+  "name": "scoring-system",
+  "version": "1.0.0",
+  "description": "VT Engineering Points Scoring System",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "init-db": "node server/initDB.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
