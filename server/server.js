@@ -7,10 +7,19 @@ const { connectToDatabase, COLLECTIONS } = require('./db'); // Single import sta
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static('public'));
+// Add this at the top of your routes
+app.use(cors({
+  origin: [
+    'https://magical-baklava-7976a1.netlify.app/',
+    'http://localhost:3000' // For testing
+  ],
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true,
+  allowedHeaders: "Content-Type,Authorization"
+}));
+
+// Add OPTIONS handler
+app.options('*', cors());
 
 // Database connection state
 let db;
