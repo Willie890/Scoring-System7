@@ -1,34 +1,35 @@
-import { login } from './api.js';
-
-document.getElementById("loginForm").addEventListener("submit", async function(e) {
+// Replace with this modern fetch implementation
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   
+  const API_BASE_URL = 'https://scoring-system7.onrender.com/'; // Your Render URL
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
-  const errorEl = document.getElementById("loginError");
 
   try {
-    const result = await login(username, password);
-    if (result.success) {
-      // Store user data in localStorage (or sessionStorage)
-      localStorage.setItem("loggedInUser", JSON.stringify(result.user));
-      // Store token if your server implements JWT
-      // localStorage.setItem("token", result.token);
+    const response = await fetch(`${API_BASE_URL}/api/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+      credentials: "include" // Essential for cookies
+    });
+
+    if (!response.ok) throw new Error(await response.text());
+    
+    const { user } = await response.json();
+    localStorage.setItem("loggedInUser", JSON.stringify(user));
+    window.location.href = user.role === "admin" 
+      ? "/admin_home.html" 
+      : "/user_home.html";
       
-      // Redirect based on role
-      window.location.href = result.user.role === "admin" 
-        ? "admin_home.html" 
-        : "user_home.html";
-    } else {
-      errorEl.textContent = result.message || "Invalid username or password";
-      document.getElementById("password").value = "";
-    }
   } catch (error) {
-    errorEl.textContent = "Login failed. Please try again.";
-    console.error("Login error:", error);
+    console.error("Login failed:", error);
+    document.getElementById("loginError").textContent = 
+      error.message.includes("401") 
+        ? "Invalid credentials" 
+        : "Login service unavailable";
   }
 });
-
 
 
 
